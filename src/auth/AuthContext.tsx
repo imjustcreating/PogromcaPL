@@ -1,46 +1,37 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import { User } from "./types";
+import React, { createContext, useContext, useState } from "react";
+import type { User } from "./types";
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
-  register: (email: string, password: string) => boolean;
+  login: (username: string, password: string) => boolean;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const demoUser: User = { email: "test@demo.pl" };
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (email: string, password: string) => {
-    if (email === "test@demo.pl" && password === "demo123") {
-      setUser(demoUser);
+  const login = (username: string, password: string) => {
+    // Demo: jedno konto admin/admin
+    if (username === "admin" && password === "admin") {
+      setUser({ username: "admin" });
       return true;
     }
-    // Tu można podłączyć backend
     return false;
-  };
-
-  const register = (email: string, password: string) => {
-    // Tu można dodać backendowe rejestrowanie
-    setUser({ email });
-    return true;
   };
 
   const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("AuthContext not found");
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
-}
+};

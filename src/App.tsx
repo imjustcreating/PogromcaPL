@@ -1,32 +1,30 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import HomePage from "./components/HomePage";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import GamePage from "./components/GamePage";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
+import MainPage from "./components/MainPage";
+import GamePage from "./components/GamePage";
 
-function PrivateRoute({ children }: { children: JSX.Element }) {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
-}
+  return user ? <>{children}</> : <Navigate to="/" />;
+};
 
-function App() {
-  return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/game" element={
-            <PrivateRoute>
+const App = () => (
+  <AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route
+          path="/game"
+          element={
+            <ProtectedRoute>
               <GamePage />
-            </PrivateRoute>
-          } />
-        </Routes>
-      </Router>
-    </AuthProvider>
-  );
-}
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
+  </AuthProvider>
+);
 
 export default App;
